@@ -2,39 +2,39 @@
 
 This repository contains a comprehensive framework for estimating **Heterogeneous Treatment Effects (HTE)** using machine learning.
 
-The project is structured as both a **functional tool** for researchers and a **step-by-step educational guide** that deconstructs the methodology. It implements a split-sample (cross-fitting) approach to estimate Conditional Average Treatment Effects (CATE) and performs statistical inference using BLP, GATES, and CLAN.
+The project is designed to be both a reusable tool and an educational resource. It provides a standalone function for causal inference, a step-by-step logic walkthrough, and a full real-world application analyzing poverty alleviation interventions.
 
 ## Repository Structure
 
-This repository consists of two main Jupyter Notebooks:
+### 1. `hte_function.py` (The Tool)
+* **Contains:** The standalone, reusable function for estimating heterogeneity.
+* **Usage:** Import this file to apply the BLP, GATES, and CLAN methodologies to your own datasets without re-writing the pipeline.
 
-### 1. `Research_Core.ipynb` (The Step-by-Step Guide)
-**Start here for the explanation.** This notebook serves as the documentation and logic breakdown for the project. It walks through the entire process in a linear, readable format:
-* **Data Preparation:** Detailed cleaning steps, handling missing values, and encoding specific covariates (e.g., `totalincome`, `ladder`).
-* **Proxy Construction:** Explains how to use ML models (like XGBoost) to create a proxy for the individual treatment effect score, $S(Z)$.
-* **Visualizations:** Includes initial plots to visualize the distribution of treatment effects before running the full loop.
+### 2. `Research_Loop.ipynb` (The Application & Case Study)
+* **Context:** A complete end-to-end analysis focused on **Poverty Alleviation**.
+* **Workflow:**
+    * **EDA:** Exploratory Data Analysis of the poverty indicators.
+    * **Application:** Applies the core HTE function to the data.
+    * **Predictions & Policy:** Analyzes the results to predict intervention impacts and derive policy insights.
+* **Goal:** Demonstrates how the tool works in a complex, real-world research scenario.
 
-### 2. `Research_Loop.ipynb` (The Main Function)
-**Use this for production/analysis.**
-This notebook contains the aggregated `estimate_heterogeneity` function. It takes the logic established in the *Core* file and operationalizes it:
-* **Automated Loop:** Iteratively splits the data into "Auxiliary" (training) and "Main" (inference) folds.
-* **Stability:** Averages results across multiple random splits to ensure robust estimates.
-* **Inference Outputs:** Automatically calculates and returns:
-    * **BLP (Best Linear Predictor):** Tests if heterogeneity exists.
-    * **GATES (Group Average Treatment Effects):** Treatment effects sorted by groups (e.g., top 20% vs bottom 20%).
-    * **CLAN (Classification Analysis):** Characteristics of the most/least affected units.
+### 3. `Research_Core.ipynb` (The Educational Guide)
+* **Context:** A "textbook" style breakdown of the methodology.
+* **Content:** Deconstructs the main function into a linear, step-by-step explanation.
+* **Key Concepts:** Explains the data cleaning logic, the construction of the ML proxy ($S(Z)$), and the cross-fitting strategy used to avoid overfitting.
 
 ## Methodology
 
-The pipeline relies on a **Cross-Fitting** strategy to prevent overfitting:
+The pipeline implements a **Cross-Fitting** strategy to prevent overfitting:
 
-1.  **Split Data:** The dataset is divided into two random folds: *Auxiliary* and *Main*.
-2.  **Train Models (Auxiliary):** We train two machine learning models (e.g., XGBoost, CatBoost, or Neural Nets) on the auxiliary fold:
-    * $\hat{\mu}_1(Z)$: Predicted outcome *with* treatment.
-    * $\hat{\mu}_0(Z)$: Predicted outcome *without* treatment.
-3.  **Compute Proxy (Main):** We apply these models to the *Main* fold to generate a predicted treatment effect score for each unit:
+1.  **Split Data:** The dataset is divided into *Auxiliary* (training) and *Main* (inference) folds.
+2.  **Train Models:** We train ML models (XGBoost, CatBoost, etc.) on the auxiliary fold to predict outcomes with ($\hat{\mu}_1$) and without ($\hat{\mu}_0$) treatment.
+3.  **Compute Proxy:** We generate a predicted treatment effect score for the main fold:
     $$S(Z) = \hat{\mu}_1(Z) - \hat{\mu}_0(Z)$$
-4.  **Estimate Effects:** We sort units in the *Main* fold based on this score to identify which subgroups benefit most or least from the intervention.
+4.  **Inference:**
+    * **BLP:** Best Linear Predictor for heterogeneity.
+    * **GATES:** Group Average Treatment Effects (e.g., top 20% vs bottom 20%).
+    * **CLAN:** Characteristics of the most/least affected groups.
 
 ## Dependencies
 * Python 3.x
@@ -42,4 +42,4 @@ The pipeline relies on a **Cross-Fitting** strategy to prevent overfitting:
 * `statsmodels`
 * `scikit-learn`
 * `xgboost`, `catboost`
-* `tensorflow` (if using Neural Net options)
+* `tensorflow` (if using Neural Net options)  
